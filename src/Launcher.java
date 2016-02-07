@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.awt.MenuBar;
 import java.util.concurrent.Semaphore;
 
+/* Add some commets */
+
 public class Launcher {
 	private static final String configFile = ".config";
 	private static final int WIDTH=1000;
