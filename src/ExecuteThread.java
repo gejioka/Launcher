@@ -6,12 +6,16 @@ import java.awt.event.*;
 import java.awt.event.ActionEvent;
 
 public class ExecuteThread implements Runnable {
-	
 	JFrame launcherWindow;
 	FindImagesPaths currentNode;
 	List<FindPathsFromExecutableFiles> listOfExecutableFiles;
 	Launcher launcher;
 
+	/** ExecuteThread ( )
+	  * type: ExecuteThread
+	  * params: JFrame launcherWindow, FindImagesPaths currentNode, List<FindPathsFromExecutableFiles> listOfExecutableFiles, Launcher launcher
+	  * Create a new ExecuteThread object.
+	**/
 	public ExecuteThread ( JFrame launcherWindow, FindImagesPaths currentNode, List<FindPathsFromExecutableFiles> listOfExecutableFiles, Launcher launcher ) {
 
 		this.launcherWindow = launcherWindow;

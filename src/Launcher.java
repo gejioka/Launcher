@@ -19,8 +19,6 @@ import java.awt.Color;
 import java.awt.MenuBar;
 import java.util.concurrent.Semaphore;
 
-/* Add some commets */
-
 public class Launcher {
 	private static final String configFile = ".config";
 	private static final int WIDTH=1000;
@@ -35,15 +33,30 @@ public class Launcher {
 	private List<String> listOfPathsFromExecutableFiles;
 	private List<Thread> listOfThreads;
 
+	/** Launcher ( )
+	  * type: Launcher
+	  * params: -
+	  * Create a new Launcher object.
+	**/
 	public Launcher ( ) {
 
 	}
 
+	/** Launcher ( )
+	  * type: Launcher
+	  * params: String launcherConfigurationFile
+	  * Create a new Launcher object.
+	**/
 	public Launcher ( String launcherConfigurationFile ) {
 
 		this.launcherConfigurationFile = launcherConfigurationFile;
 	}
 
+	/** createTheLauncherWindow ( )
+	  * type: void
+	  * params: Launcher launcher
+	  * Create the window of app.
+	**/
 	public void createTheLauncherWindow ( Launcher launcher ) {
 
 		JFrame launcherWindow = new JFrame ( );
@@ -55,7 +68,12 @@ public class Launcher {
 
 		createMenu ( launcherWindow, launcher );
 	}
-
+	
+	/** createMenu ( )
+	  * type: void
+	  * params: JFrame launcherWindow, Launcher launcher
+	  * Create the menu of the app.
+	**/
 	private void createMenu ( JFrame launcherWindow, Launcher launcher ) {
 		
 		JMenu menu = new JMenu ( "Menu" );
@@ -89,22 +107,24 @@ public class Launcher {
 	    findImagesNames ( launcherWindow, launcher );
 	}
 
+	/** findImagesNames ( )
+	  * type: void
+	  * params: JFrame launcherWindow, Launcher launcher
+	  * Find the names of the images.
+	**/
 	public void findImagesNames ( JFrame launcherWindow, Launcher launcher ) {
 
 		try {
-
 			File file = new File ( launcherConfigurationFile );
 		    FileReader fReader = new FileReader( file );
 		    BufferedReader in = new BufferedReader( fReader );
 		    String inputLine;	
 		    FindImagesPaths imageNode;
 		    FindPathsFromExecutableFiles executableFileNode;
-		    String absolutePathForImages="/home/tsokos";
-		    String relativePathForImages="~/";
 		    String absolutePathForExecutableFiles="/usr/bin";
-		    String parentFolderName="img";
 		    int firstTime=1;	
 
+		    
 		    strLauncherConfigurationFile = new StringBuffer ( );
 		    while ( ( inputLine = in.readLine ( ) ) != null ) {
 
@@ -164,6 +184,11 @@ public class Launcher {
 	    }
 	}
 
+	/** createAllImageButtonsInFrame ( )
+	  * type: void
+	  * params: JFrame launcherWindow, List<FindPathsFromExecutableFiles> listOfExecutableFiles, Launcher launcher
+	  * Create all the buttons for the app.
+	**/
 	public void createAllImageButtonsInFrame ( JFrame launcherWindow, List<FindPathsFromExecutableFiles> listOfExecutableFiles, Launcher launcher ) {
 
 		Iterator<FindImagesPaths> findIt;
@@ -190,6 +215,11 @@ public class Launcher {
 	    }
 	}
 	
+	/** loadPropertyFileIcons ( )
+	  * type: void
+	  * params: JButton button, FindImagesPaths currentNode
+	  * Load the file icons property.
+	**/
 	public void loadPropertyFileIcons ( JButton button, FindImagesPaths currentNode ) {
 
 		Properties prop = new Properties ( );
