@@ -107,8 +107,7 @@ public class FindPathsFromExecutableFiles {
 
 				setExecutableFileName ( listOfFiles[i].getName ( ) );
 				setExecutableFilePath ( listOfFiles[i].getPath ( ) );
-
-				System.out.println ( listOfFiles[i].getName ( ) );
+				setRootFolderPath ( listOfFiles[i].getParentFile ( ).getName ( ) );
 			}
 		} 
 	}

@@ -20,7 +20,6 @@ import java.awt.MenuBar;
 import java.util.concurrent.Semaphore;
 
 public class Launcher {
-	private static final String configFile = ".config";
 	private static final int WIDTH=1000;
 	private static final int HEIGHT=120;
 	private String launcherConfigurationFile;
@@ -115,72 +114,66 @@ public class Launcher {
 	public void findImagesNames ( JFrame launcherWindow, Launcher launcher ) {
 
 		try {
-			File file = new File ( launcherConfigurationFile );
-		    FileReader fReader = new FileReader( file );
-		    BufferedReader in = new BufferedReader( fReader );
 		    String inputLine;	
 		    FindImagesPaths imageNode;
 		    FindPathsFromExecutableFiles executableFileNode;
+		    String absolutePathOfImages="/usr/share/icons/hicolor";
 		    String absolutePathForExecutableFiles="/usr/bin";
-		    int firstTime=1;	
+		    String configFile="../.config";
 
+		    File file = new File ( configFile );
+			File currentFile;
+		    FileReader fReader = new FileReader( file );
+		    BufferedReader in = new BufferedReader( fReader );
 		    
 		    strLauncherConfigurationFile = new StringBuffer ( );
 		    while ( ( inputLine = in.readLine ( ) ) != null ) {
 
 		    	strLauncherConfigurationFile.append ( inputLine );
 		    }
-
 		    fReader.close ( );
 
-			Pattern nodeP = Pattern.compile( "(Program Name: )([a-zA-Z-]+)([\\p{Punct}]+)([a-zA-Z]+)" );
+			Pattern nodeP = Pattern.compile( "([a-zA-Z-]+)" );
 			Matcher nodeM = nodeP.matcher( strLauncherConfigurationFile );
 
 			while ( nodeM.find ( ) ) {
-
-				if ( !nodeM.group ( 2 ).isEmpty ( ) && !nodeM.group ( 4 ).isEmpty ( ) ) {
 					
-					imageNode = new FindImagesPaths ( );
-					executableFileNode = new FindPathsFromExecutableFiles ( );
+				imageNode = new FindImagesPaths ( );
+				executableFileNode = new FindPathsFromExecutableFiles ( );
 
-					iconName = nodeM.group ( 2 );
-					iconType = nodeM.group ( 4 );
+				imageNode.setRootFolderPath ( absolutePathOfImages );
+				currentFile = imageNode.findTheRequestedFile ( imageNode.createListWithTheRightFolders ( ), nodeM.group ( 1 ) );
+				imageNode.setAbsolutePath ( currentFile.getAbsolutePath ( ) );
+				imageNode.findNameOfImage ( currentFile.getName ( ) );
+				imageNode.findTypeOfImage ( currentFile.getName ( ) );
+				imageNode.setAbsoluteNameOfImage ( imageNode.getImageName ( ), imageNode.getImageType ( ) );
+				imageNode.setParentFolderPath ( currentFile.getParentFile ( ).getPath ( ) );
+				imageNode.setResolutionOfImage ( currentFile );
 
-					imageNode.setRelativePath ( relativePathForImages );
-					imageNode.setAbsolutePathForImage ( absolutePathForImages );
-					imageNode.setImageName ( iconName );
-					imageNode.setImageType ( iconType );
-					imageNode.setAbsoluteNameOfImage ( iconName, iconType );
-					imageNode.setImagePath ( imageNode.findImagePath ( iconName, iconType ) );
+				executableFileNode.setRootFolderPath ( absolutePathForExecutableFiles );
+				executableFileNode.findFilePath ( imageNode.getImageName ( ) );
 
-					executableFileNode.setAbsolutePathForExecutableFiles ( absolutePathForExecutableFiles );
-					executableFileNode.setExecutableFileName ( iconName );
-					executableFileNode.setExecutableFilePath ( executableFileNode.findExecutableFilePath ( ) );
+				try {
 
-					if ( firstTime == 1 ) {
+					listOfImages.add ( imageNode );
+					listOfExecutableFiles.add ( executableFileNode );
+				}catch ( Exception ex ) {
 
-						listOfImages = new LinkedList<FindImagesPaths> ( );
-						listOfExecutableFiles = new LinkedList<FindPathsFromExecutableFiles> ( );
+					listOfImages = new LinkedList<FindImagesPaths> ( );
+					listOfExecutableFiles = new LinkedList<FindPathsFromExecutableFiles> ( );
 
-						listOfImages.add ( imageNode );
-						listOfExecutableFiles.add ( executableFileNode );
-
-	 					firstTime = 0;
-					}else {
-						
-						listOfImages.add ( imageNode );
-						listOfExecutableFiles.add ( executableFileNode );
-					}
+					listOfImages.add ( imageNode );
+					listOfExecutableFiles.add ( executableFileNode );
 				}
 			}
 
 			createAllImageButtonsInFrame ( launcherWindow, listOfExecutableFiles, launcher );
 		}catch( FileNotFoundException ex ) {
 	     
-	      System.out.println( "The specified file was not found at "+ launcherConfigurationFile );
+	      System.out.println( "The specified file was not found at " + launcherConfigurationFile );
 	    }catch( IOException ex ) {
 	      
-	      System.out.println( "IOException occured while reading from file "+ launcherConfigurationFile );
+	      System.out.println( "IOException occured while reading from file " + launcherConfigurationFile );
 	    }
 	}
 
@@ -230,14 +223,14 @@ public class Launcher {
 
 		try {
 
-			input = new FileInputStream ( currentNode.findImagePath ( "icon", "properties" ) );
-			prop.load ( input );
+			//input = new FileInputStream ( currentNode.findImagePath ( "icon", "properties" ) );
+			//prop.load ( input );
 
-			iconString = prop.getProperty ( currentNode.getImageType ( ), currentNode.getAbsoluteNameOfImage ( ) );
+			//iconString = prop.getProperty ( currentNode.getImageType ( ), currentNode.getAbsoluteNameOfImage ( ) );
 
 			try {
 						
-				image = new ImageIcon ( currentNode.getImagePath ( ) );
+				image = new ImageIcon ( currentNode.getAbsolutePath ( ) );
 				button.setIcon ( image );
 
 			} catch (Exception ex) {
@@ -280,7 +273,7 @@ public class Launcher {
 	
 	public static void main ( String args[] ) {
 	
-		Launcher launcher = new Launcher ( configFile ); 
+		Launcher launcher = new Launcher ( ); 
 		launcher.createTheLauncherWindow ( launcher );
 	}
 }

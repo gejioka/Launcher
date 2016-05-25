@@ -16,7 +16,6 @@ import javax.swing.event.*;
 import java.util.regex.*;
 
 public class FindImagesPaths {
-	private String relativePath;
 	private String absolutePath;
 	private String imageName;
 	private String imagePath;
@@ -24,6 +23,7 @@ public class FindImagesPaths {
 	private String absoluteName;
 	private String rootFolderPath;
 	private String parentFolderPath;
+	private int resolutionOfImage;
 	private int totalProgramsNumber;
 
 	/** FindImagesPaths ( )
@@ -151,11 +151,9 @@ public class FindImagesPaths {
 	  * Set the path of the parent.
 	**/
 	public void setParentFolderPath ( String imagePath ) {
-
 		File parentPath = new File ( imagePath );
-		String parentNodePath;
 
-		parentNodePath = parentPath.getParent ( );
+		parentFolderPath = parentPath.getParent ( );
 	}
 
 	/** getParentFolderPath ( )
@@ -165,8 +163,48 @@ public class FindImagesPaths {
 	**/
 	public String getParentFolderPath ( ) {
 
-		return parentNodePath;
+		return parentFolderPath;
 	}
+
+	/** setResolutionOfImage ( )
+	  * type: void
+	  * params: File Image
+	  * Set the resolution of the specific image.
+	**/
+	public void setResolutionOfImage ( File image ) {
+		File parent;
+
+		parent = image.getParentFile ( );
+		if ( parent.getName ( ).equals ( "apps" ) ) {
+
+			parent = parent.getParentFile ( );
+
+
+			Pattern pattern = Pattern.compile( "([0-9]+)" );
+			Matcher m = pattern.matcher ( parent.getName ( ) );
+
+			if ( m.find ( ) ) {
+
+				resolutionOfImage = Integer.parseInt ( m.group ( 1 ) );
+			}else {
+
+				System.out.println ( "No match found." );
+			}
+		}else {
+
+			System.out.println ( "The specific path doesn't exist.");
+		}
+	}
+
+	/** getResolutionOfImage ( )
+	  * type: int
+	  * params: -
+	  * Return the image resolution.
+	**/
+	public int getResolutionOfImage ( ) {
+
+		return resolutionOfImage;
+	} 
 
 	/** createListWithTheRightFolders ( )
 	  * type: List<File>
@@ -196,7 +234,7 @@ public class FindImagesPaths {
 				
 				imageSize = currentChildren[numOfChildren].getName ( ).substring ( 0, sizeOfSubstring );
 				
-				if ( !imageSize.matches ( "[a-zA-Z]*" ) ) {
+				if ( !imageSize.matches ( "[a-zA-Z]+" ) ) {
 					
 					sizeOfIMage = Integer.parseInt ( imageSize );
 					if ( sizeOfIMage >= 128 ) {
@@ -245,7 +283,6 @@ public class FindImagesPaths {
 		
 		if ( m.find ( ) ) {
 			
-			System.out.println ( m.group ( 2 ) );
 			setImageType ( m.group ( 2 ) );
 		}
 	}
@@ -255,7 +292,7 @@ public class FindImagesPaths {
 	  * params: List<File> listOfChildren, String fileName
 	  * Return the requested file.
 	**/ 
-	public String findTheRequestedFile ( List<File> listOfChildren, String fileName ) {
+	public File findTheRequestedFile ( List<File> listOfChildren, String fileName ) {
 		Iterator<File> listIt = listOfChildren.listIterator ( );
 		File currentFolder;
 		File[] currentChildren;
@@ -286,7 +323,7 @@ public class FindImagesPaths {
 					findNameOfImage ( currentChildren[numOfChildren].getName ( ) );
 					findTypeOfImage ( currentChildren[numOfChildren].getName ( ) );
 					
-					return currentChildren[numOfChildren].getName ( );
+					return currentChildren[numOfChildren];
 				}
 			}
 		}
