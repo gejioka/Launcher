@@ -18,10 +18,13 @@ import javax.swing.*;
 import java.awt.Color;
 import java.awt.MenuBar;
 import java.util.concurrent.Semaphore;
+import java.nio.charset.*;
+import java.nio.file.*;
 
 public class Launcher {
-	private static final int WIDTH=1000;
-	private static final int HEIGHT=120;
+	private static String configFile = "../.config";
+	private static String absolutePathOfImages = "/usr/share/icons/hicolor";
+	private static String absolutePathForExecutableFiles = "/usr/bin";
 	private String launcherConfigurationFile;
 	private String iconName;
 	private String iconType;
@@ -53,13 +56,13 @@ public class Launcher {
 
 	/** createTheLauncherWindow ( )
 	  * type: void
-	  * params: Launcher launcher
+	  * params: Launcher launcher, int width, int height
 	  * Create the window of app.
 	**/
-	public void createTheLauncherWindow ( Launcher launcher ) {
+	public void createTheLauncherWindow ( Launcher launcher, int width, int height ) {
 
 		JFrame launcherWindow = new JFrame ( );
-		launcherWindow.setSize ( WIDTH, HEIGHT );
+		launcherWindow.setSize ( width, height );
 		launcherWindow.setTitle ( "Launcher" );
 		launcherWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
 		launcherWindow.setLayout( new GridLayout ( 1, 3 ) );
@@ -103,7 +106,7 @@ public class Launcher {
 	    bar.add ( menu );
 	    launcherWindow.setJMenuBar ( bar );
 
-	    findImagesNames ( launcherWindow, launcher );
+	    createAllImageButtonsInFrame ( launcherWindow, listOfExecutableFiles, launcher );
 	}
 
 	/** findImagesNames ( )
@@ -111,15 +114,15 @@ public class Launcher {
 	  * params: JFrame launcherWindow, Launcher launcher
 	  * Find the names of the images.
 	**/
-	public void findImagesNames ( JFrame launcherWindow, Launcher launcher ) {
+	public void findImagesNames ( Launcher launcher ) {
 
 		try {
 		    String inputLine;	
 		    FindImagesPaths imageNode;
 		    FindPathsFromExecutableFiles executableFileNode;
-		    String absolutePathOfImages="/usr/share/icons/hicolor";
-		    String absolutePathForExecutableFiles="/usr/bin";
-		    String configFile="../.config";
+		    
+		    int width=128;
+		    int height=128;
 
 		    File file = new File ( configFile );
 			File currentFile;
@@ -132,10 +135,10 @@ public class Launcher {
 		    	strLauncherConfigurationFile.append ( inputLine );
 		    }
 		    fReader.close ( );
-
+			
 			Pattern nodeP = Pattern.compile( "([a-zA-Z-]+)" );
 			Matcher nodeM = nodeP.matcher( strLauncherConfigurationFile );
-
+			
 			while ( nodeM.find ( ) ) {
 					
 				imageNode = new FindImagesPaths ( );
@@ -143,6 +146,7 @@ public class Launcher {
 
 				imageNode.setRootFolderPath ( absolutePathOfImages );
 				currentFile = imageNode.findTheRequestedFile ( imageNode.createListWithTheRightFolders ( ), nodeM.group ( 1 ) );
+
 				imageNode.setAbsolutePath ( currentFile.getAbsolutePath ( ) );
 				imageNode.findNameOfImage ( currentFile.getName ( ) );
 				imageNode.findTypeOfImage ( currentFile.getName ( ) );
@@ -155,6 +159,7 @@ public class Launcher {
 
 				try {
 
+					width = width + 128;
 					listOfImages.add ( imageNode );
 					listOfExecutableFiles.add ( executableFileNode );
 				}catch ( Exception ex ) {
@@ -167,7 +172,7 @@ public class Launcher {
 				}
 			}
 
-			createAllImageButtonsInFrame ( launcherWindow, listOfExecutableFiles, launcher );
+			launcher.createTheLauncherWindow ( launcher, width, height );
 		}catch( FileNotFoundException ex ) {
 	     
 	      System.out.println( "The specified file was not found at " + launcherConfigurationFile );
@@ -223,11 +228,6 @@ public class Launcher {
 
 		try {
 
-			//input = new FileInputStream ( currentNode.findImagePath ( "icon", "properties" ) );
-			//prop.load ( input );
-
-			//iconString = prop.getProperty ( currentNode.getImageType ( ), currentNode.getAbsoluteNameOfImage ( ) );
-
 			try {
 						
 				image = new ImageIcon ( currentNode.getAbsolutePath ( ) );
@@ -244,9 +244,38 @@ public class Launcher {
 	}
 
 	public class CreateFileMenuItemActionListener implements ActionListener {
+		private String newApp;
+
+		public CreateFileMenuItemActionListener ( ) {
+
+		}
 
 		public void actionPerformed ( ActionEvent e ) {
+			JFrame addWindow = new JFrame ( );
+			int width = 300;
+			int height = 300;
 
+			addWindow.setSize ( width, height );
+			addWindow.setTitle ( "Add New App" );
+			addWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
+			
+			JLabel addJLabel = new JLabel("Add app: ", JLabel.RIGHT);
+			addJLabel.setSize ( 50, 50 );
+
+			JTextField userText = new JTextField( "Test" );
+			userText.setSize ( 100, 100 );
+
+			addWindow.add ( addJLabel );
+			addWindow.add ( userText );
+			addWindow.setVisible ( true );
+
+			/*
+			try {
+  				
+  				Files.write ( Paths.get ( configFile ), newApp.getBytes ( ), StandardOpenOption.APPEND );
+			}catch ( IOException ioex ) {
+    			//exception handling left as an exercise for the reader
+			}*/
 		}
 	}
 
@@ -274,6 +303,6 @@ public class Launcher {
 	public static void main ( String args[] ) {
 	
 		Launcher launcher = new Launcher ( ); 
-		launcher.createTheLauncherWindow ( launcher );
+		launcher.findImagesNames ( launcher );
 	}
 }

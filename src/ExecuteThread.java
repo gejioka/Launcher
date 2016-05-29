@@ -55,11 +55,12 @@ public class ExecuteThread implements Runnable {
 		    		currentNode = imIt.next ( );
 		    		if ( currentNode.getExecutableFileName ( ).contains ( nameOfExecuteFile ) ) {
 		    			
-		    			Process proc = Runtime.getRuntime().exec(nameOfExecuteFile);
+		    			Process proc = Runtime.getRuntime( ).exec( nameOfExecuteFile );
 		    			
 		    		}
 				}
 			}catch ( Exception ex ) {
+				
 				System.out.println ( "Here" );
 			}
 		}
