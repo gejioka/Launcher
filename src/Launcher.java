@@ -3,6 +3,7 @@ import java.awt.BorderLayout;
 import java.awt.image.*;
 import java.awt.event.*;
 import java.awt.GridLayout;
+import java.awt.FlowLayout;
 import java.io.*;
 import java.util.*;
 import java.lang.*;
@@ -244,38 +245,73 @@ public class Launcher {
 	}
 
 	public class CreateFileMenuItemActionListener implements ActionListener {
-		private String newApp;
-
-		public CreateFileMenuItemActionListener ( ) {
-
-		}
 
 		public void actionPerformed ( ActionEvent e ) {
-			JFrame addWindow = new JFrame ( );
-			int width = 300;
-			int height = 300;
+			final JFrame addWindow;
+			JLabel headerLabel;
+			JLabel statusLabel;
+			JPanel controlPanel;
 
-			addWindow.setSize ( width, height );
+			addWindow = new JFrame ( );
+
+			addWindow.setSize ( 400, 300 );
 			addWindow.setTitle ( "Add New App" );
 			addWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
+			addWindow.setLayout( new GridLayout ( 3, 1 ) );
 			
-			JLabel addJLabel = new JLabel("Add app: ", JLabel.RIGHT);
-			addJLabel.setSize ( 50, 50 );
+			headerLabel = new JLabel ( "", JLabel.CENTER );
+			statusLabel = new JLabel("",JLabel.CENTER);    
 
-			JTextField userText = new JTextField( "Test" );
-			userText.setSize ( 100, 100 );
+    		statusLabel.setSize(250,100);
 
-			addWindow.add ( addJLabel );
-			addWindow.add ( userText );
+			controlPanel = new JPanel();
+        	controlPanel.setLayout(new FlowLayout());
+
+        	addWindow.add ( headerLabel );
+        	addWindow.add ( controlPanel );
+        	addWindow.add ( statusLabel );
+
 			addWindow.setVisible ( true );
 
-			/*
-			try {
-  				
-  				Files.write ( Paths.get ( configFile ), newApp.getBytes ( ), StandardOpenOption.APPEND );
-			}catch ( IOException ioex ) {
-    			//exception handling left as an exercise for the reader
-			}*/
+			headerLabel.setText ( "Add a new application you want to launch.");
+
+			JLabel  namelabel = new JLabel("New app to add: ", JLabel.RIGHT);
+			final JTextField userText = new JTextField( 10 );
+
+			JButton addButton = new JButton("OK");
+			addButton.addActionListener(new ActionListener() {
+         		
+         		public void actionPerformed(ActionEvent e) {     
+        			String textToAppend;
+        			File file;
+
+        			file = new File ( configFile );
+
+        			try {
+    					
+    					if ( file.length ( ) == 0 ) {
+    						
+    						textToAppend = userText.getText ( ) + "\\";
+    						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
+    					}else {
+
+    						textToAppend = "\n" + userText.getText ( ) + "\\";
+    						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
+    					}
+					}catch (IOException ioex) {
+    					
+    					//exception handling left as an exercise for the reader
+					}
+
+        			addWindow.setVisible ( false );
+         		}
+      		});
+
+			controlPanel.add ( namelabel );
+			controlPanel.add ( userText );
+			controlPanel.add ( addButton );
+
+			addWindow.setVisible ( true );
 		}
 	}
 
