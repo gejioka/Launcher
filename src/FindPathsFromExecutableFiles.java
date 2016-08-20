@@ -18,6 +18,7 @@ public class FindPathsFromExecutableFiles {
 	private String executableFileName;
 	private String executableFilePath;
 	private String rootFolderPath;
+	private String parentFolderPath;
 
 	/** FindPathsFromExecutableFiles ( )
 	  * type: FindPathsFromExecutableFiles
@@ -88,11 +89,32 @@ public class FindPathsFromExecutableFiles {
 		return rootFolderPath;
 	}
 
+	/** setParentFolderPath ( )
+	  * type: void
+	  * params: String parentFolderPath
+	  * Set the path of parent of the specific file.
+	**/
+	public void setParentFolderPath ( String parentFolderPath ) {
+
+		this.parentFolderPath = parentFolderPath;
+	}
+
+	/** getParentFolderPath ( )
+	  * type: String
+	  * params: -
+	  * Return the path of the parent of the specific file.
+	**/
+	public String getParentFolderPath ( ) {
+
+		return parentFolderPath;
+	}
+
 	/** findFilePath ( )
 	  * type: void
 	  * params: String fileName
 	  * Find the specific executable file.
 	**/
+	/*
 	public void findFilePath ( String fileName ) {
 		File rootFile;
 		File[] listOfFiles;
@@ -103,14 +125,12 @@ public class FindPathsFromExecutableFiles {
 
 		for ( i = 0; i < listOfFiles.length; i++ ) {
 
-			if ( listOfFiles[i].getName ( ).contains ( fileName ) && listOfFiles[i].canExecute ( ) ) {
+			if ( listOfFiles[i].getName ( ).contains ( fileName ) ) {
 
 				setExecutableFileName ( listOfFiles[i].getName ( ) );
 				setExecutableFilePath ( listOfFiles[i].getPath ( ) );
 				setRootFolderPath ( listOfFiles[i].getParentFile ( ).getName ( ) );
 			}
 		} 
-	}
-
-	// TODO: 1) If there are two different programms which contain the same fileName ask user if he want both or one of them.
-} 	//		 2) If there are spaces between words replace them with '-'. 	
+	}*/
+}	

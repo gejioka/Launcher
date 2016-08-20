@@ -24,17 +24,17 @@ import java.nio.file.*;
 
 public class Launcher {
 	private static String configFile = "../.config";
-	private static String absolutePathOfImages = "/usr/share/icons/hicolor";
-	private static String absolutePathForExecutableFiles = "/usr/bin";
+	private static String absolutePathOfImages = "/usr/share/icons";
+	private static String absolutePathForExecutableFiles = "/usr/share/applications";
 	private String launcherConfigurationFile;
-	private String iconName;
-	private String iconType;
 	private StringBuffer strLauncherConfigurationFile;
 	private List<FindImagesPaths> listOfImages;
 	private List<File> listOfAllPrograms; 
 	private List<FindPathsFromExecutableFiles> listOfExecutableFiles;
 	private List<String> listOfPathsFromExecutableFiles;
 	private List<Thread> listOfThreads;
+	private boolean resize;
+	private JFrame launcherWindow;
 
 	/** Launcher ( )
 	  * type: Launcher
@@ -47,12 +47,33 @@ public class Launcher {
 
 	/** Launcher ( )
 	  * type: Launcher
+	  * params: boolean resize
+	  * Create a new Launcher object.
+	**/
+	public Launcher ( boolean resize ) {
+
+		this.resize = resize;
+	}
+
+	/** Launcher ( )
+	  * type: Launcher
 	  * params: String launcherConfigurationFile
 	  * Create a new Launcher object.
 	**/
 	public Launcher ( String launcherConfigurationFile ) {
 
 		this.launcherConfigurationFile = launcherConfigurationFile;
+	}
+
+	/** Launcher ( )
+	  * type: Launcher
+	  * params: String launcherConfigurationFile, boolean resize
+	  * Create a new Launcher object.
+	**/
+	public Launcher ( String launcherConfigurationFile, boolean resize ) {
+
+		this.launcherConfigurationFile = launcherConfigurationFile;
+		this.resize = resize;
 	}
 
 	/** createTheLauncherWindow ( )
@@ -62,7 +83,12 @@ public class Launcher {
 	**/
 	public void createTheLauncherWindow ( Launcher launcher, int width, int height ) {
 
-		JFrame launcherWindow = new JFrame ( );
+		if ( !resize ) {
+
+			launcherWindow = new JFrame ( );
+			resize = false;	
+		}
+		
 		launcherWindow.setSize ( width, height );
 		launcherWindow.setTitle ( "Launcher" );
 		launcherWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
@@ -84,7 +110,7 @@ public class Launcher {
 	    menu.setMnemonic ( KeyEvent.VK_C );
 	 
 	    JMenuItem createFileMenuItem = new JMenuItem ( "Add" );
-	    createFileMenuItem.addActionListener ( new CreateFileMenuItemActionListener ( ) );    
+	    createFileMenuItem.addActionListener ( new CreateFileMenuItemActionListener ( launcher ) );    
 	    createFileMenuItem.setMnemonic ( KeyEvent.VK_F );
 	    menu.add ( createFileMenuItem );
 
@@ -118,35 +144,69 @@ public class Launcher {
 	public void findImagesNames ( Launcher launcher ) {
 
 		try {
-		    String inputLine;	
+		    String inputLine;
+		    File image;
+		    File currFile;
+		    File wrongFile;	
+		    Search searchImage;
+		    Search searchExecFile;
 		    FindImagesPaths imageNode;
 		    FindPathsFromExecutableFiles executableFileNode;
-		    
-		    int width=128;
-		    int height=128;
-
-		    File file = new File ( configFile );
-			File currentFile;
-		    FileReader fReader = new FileReader( file );
-		    BufferedReader in = new BufferedReader( fReader );
+		    Iterator<File> fileIt;
+		    File currentFile;		    
+		    int width			= 0;
+		    int height			= 128;
+		    File file 			= new File ( configFile );
+		    FileReader fReader 	= new FileReader( file );
+		    BufferedReader in 	= new BufferedReader( fReader );
 		    
 		    strLauncherConfigurationFile = new StringBuffer ( );
 		    while ( ( inputLine = in.readLine ( ) ) != null ) {
 
 		    	strLauncherConfigurationFile.append ( inputLine );
 		    }
+
 		    fReader.close ( );
 			
 			Pattern nodeP = Pattern.compile( "([a-zA-Z-]+)" );
 			Matcher nodeM = nodeP.matcher( strLauncherConfigurationFile );
 			
 			while ( nodeM.find ( ) ) {
-					
+				
+				searchImage = new Search ( absolutePathOfImages, nodeM.group ( 1 ), true ); 
 				imageNode = new FindImagesPaths ( );
 				executableFileNode = new FindPathsFromExecutableFiles ( );
 
 				imageNode.setRootFolderPath ( absolutePathOfImages );
-				currentFile = imageNode.findTheRequestedFile ( imageNode.createListWithTheRightFolders ( ), nodeM.group ( 1 ) );
+				searchImage.searchForSpecificFile ( );
+				searchImage.createListWithImages ( );
+				searchImage.removeSVGImages ( );
+				image = searchImage.findImageWithCorrectSize ( 128 );
+				imageNode.setAbsolutePath ( image.getAbsolutePath ( ) );
+				imageNode.findNameOfImage ( image.getName ( ) );
+				imageNode.findTypeOfImage ( image.getName ( ) );
+				imageNode.setAbsoluteNameOfImage ( imageNode.getImageName ( ), imageNode.getImageType ( ) );
+				imageNode.setParentFolderPath ( image.getParentFile ( ).getPath ( ) );
+
+				searchExecFile = new Search ( absolutePathForExecutableFiles, nodeM.group ( 1 ), false );
+				executableFileNode.setRootFolderPath ( absolutePathForExecutableFiles );
+				wrongFile = searchExecFile.searchForSpecificFile ( );
+				//System.out.println ( wrongFile.getName ( ) );
+				searchExecFile.setNodeToTheList ( wrongFile );
+
+				fileIt = searchExecFile.getListOfFiles ( ).listIterator ( );
+				//System.out.println ( searchExecFile.getListOfFiles ( ).size ( ) );
+				
+				while ( fileIt.hasNext ( ) ) {
+
+					currFile = fileIt.next ( );
+
+					executableFileNode.setExecutableFileName ( currFile.getName ( ) );
+					executableFileNode.setExecutableFilePath ( currFile.getPath ( ) );
+					executableFileNode.setParentFolderPath ( currFile.getParent ( ) );
+				}
+
+				/*currentFile = imageNode.findTheRequestedFile ( imageNode.createListWithTheRightFolders ( ), nodeM.group ( 1 ) );
 
 				imageNode.setAbsolutePath ( currentFile.getAbsolutePath ( ) );
 				imageNode.findNameOfImage ( currentFile.getName ( ) );
@@ -156,7 +216,9 @@ public class Launcher {
 				imageNode.setResolutionOfImage ( currentFile );
 
 				executableFileNode.setRootFolderPath ( absolutePathForExecutableFiles );
-				executableFileNode.findFilePath ( imageNode.getImageName ( ) );
+				executableFileNode.findFilePath ( imageNode.getImageName ( ) );*/
+
+
 
 				try {
 
@@ -245,6 +307,12 @@ public class Launcher {
 	}
 
 	public class CreateFileMenuItemActionListener implements ActionListener {
+		private Launcher launcher;
+
+		public CreateFileMenuItemActionListener ( Launcher launcher ) {
+
+			this.launcher = launcher;
+		}
 
 		public void actionPerformed ( ActionEvent e ) {
 			final JFrame addWindow;
@@ -257,20 +325,26 @@ public class Launcher {
 			addWindow.setSize ( 400, 300 );
 			addWindow.setTitle ( "Add New App" );
 			addWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
-			addWindow.setLayout( new GridLayout ( 3, 1 ) );
+			addWindow.setLayout( new GridLayout ( 100, 100 ) );
 			
 			headerLabel = new JLabel ( "", JLabel.CENTER );
 			statusLabel = new JLabel("",JLabel.CENTER);    
 
     		statusLabel.setSize(250,100);
 
-			controlPanel = new JPanel();
-        	controlPanel.setLayout(new FlowLayout());
+			//controlPanel = new JPanel();
+        	//controlPanel.setLayout(new FlowLayout());
+
+        	JLabel background = new JLabel ( new ImageIcon ( "/home/giorgos/Documents/Projects/Launcher/bin/newImage.png") );
+        	
+        	addWindow.add ( background );
+        	background.setLayout ( new FlowLayout ( ) );
 
         	addWindow.add ( headerLabel );
-        	addWindow.add ( controlPanel );
+        	//addWindow.add ( controlPanel );
         	addWindow.add ( statusLabel );
 
+			addWindow.pack ( );
 			addWindow.setVisible ( true );
 
 			headerLabel.setText ( "Add a new application you want to launch.");
@@ -295,7 +369,7 @@ public class Launcher {
     						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
     					}else {
 
-    						textToAppend = "\n" + userText.getText ( ) + "\\";
+    						textToAppend = userText.getText ( ) + "\\";
     						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
     					}
 					}catch (IOException ioex) {
@@ -304,12 +378,21 @@ public class Launcher {
 					}
 
         			addWindow.setVisible ( false );
+        			resize = true;
+
+        			launcher.findImagesNames ( launcher );
          		}
       		});
 
+			/*
 			controlPanel.add ( namelabel );
 			controlPanel.add ( userText );
 			controlPanel.add ( addButton );
+			*/
+
+			background.add ( namelabel );
+			background.add ( userText );
+			background.add ( addButton );
 
 			addWindow.setVisible ( true );
 		}
@@ -338,7 +421,7 @@ public class Launcher {
 	
 	public static void main ( String args[] ) {
 	
-		Launcher launcher = new Launcher ( ); 
+		Launcher launcher = new Launcher ( false ); 
 		launcher.findImagesNames ( launcher );
 	}
 }

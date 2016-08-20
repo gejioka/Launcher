@@ -16,6 +16,7 @@ import javax.swing.event.*;
 import java.util.regex.*;
 
 public class FindImagesPaths {
+	private BufferedImage bufferedImage;
 	private String absolutePath;
 	private String imageName;
 	private String imagePath;
@@ -25,6 +26,8 @@ public class FindImagesPaths {
 	private String parentFolderPath;
 	private int resolutionOfImage;
 	private int totalProgramsNumber;
+	private int WIDTH 	= 128;
+	private int HEIGHT 	= 128;
 
 	/** FindImagesPaths ( )
 	  * type: FindImagesPaths

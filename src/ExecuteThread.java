@@ -36,6 +36,11 @@ public class ExecuteThread implements Runnable {
 		private String nameOfExecuteFile;
 		private List<FindPathsFromExecutableFiles> listOfExecutableFiles;
 
+		/** ExecuteActionListener ( )
+		  * type: ExecuteActionListener
+		  * params: String nameOfExecuteFile, List<FindPathsFromExecutableFiles> listOfExecutableFiles
+		  * Create a new ExecuteActionListener object.
+		**/
 		public ExecuteActionListener ( String nameOfExecuteFile, List<FindPathsFromExecutableFiles> listOfExecutableFiles ) {
 
 			this.nameOfExecuteFile = nameOfExecuteFile;
@@ -53,9 +58,11 @@ public class ExecuteThread implements Runnable {
 		    	while ( imIt.hasNext ( ) ) {
 
 		    		currentNode = imIt.next ( );
+
+		    		System.out.println ( currentNode.getExecutableFileName ( ) + " " + nameOfExecuteFile );
 		    		if ( currentNode.getExecutableFileName ( ).contains ( nameOfExecuteFile ) ) {
 		    			
-		    			Process proc = Runtime.getRuntime( ).exec( nameOfExecuteFile );
+		    			Process proc = Runtime.getRuntime( ).exec( new String[] { "/bin/bash", "deskopen", currentNode.getExecutableFilePath ( ) } );
 		    			
 		    		}
 				}
