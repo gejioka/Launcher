@@ -86,7 +86,11 @@ public class Launcher {
 		if ( !resize ) {
 
 			launcherWindow = new JFrame ( );
-			resize = false;	
+			resize = true;	
+		}else {
+
+			launcherWindow.dispose ( );
+			launcherWindow = new JFrame ( );
 		}
 		
 		launcherWindow.setSize ( width, height );
@@ -155,7 +159,7 @@ public class Launcher {
 		    Iterator<File> fileIt;
 		    File currentFile;		    
 		    int width			= 0;
-		    int height			= 128;
+		    int height			= 160;
 		    File file 			= new File ( configFile );
 		    FileReader fReader 	= new FileReader( file );
 		    BufferedReader in 	= new BufferedReader( fReader );
@@ -191,34 +195,18 @@ public class Launcher {
 				searchExecFile = new Search ( absolutePathForExecutableFiles, nodeM.group ( 1 ), false );
 				executableFileNode.setRootFolderPath ( absolutePathForExecutableFiles );
 				wrongFile = searchExecFile.searchForSpecificFile ( );
-				//System.out.println ( wrongFile.getName ( ) );
 				searchExecFile.setNodeToTheList ( wrongFile );
 
 				fileIt = searchExecFile.getListOfFiles ( ).listIterator ( );
-				//System.out.println ( searchExecFile.getListOfFiles ( ).size ( ) );
-				
 				while ( fileIt.hasNext ( ) ) {
 
 					currFile = fileIt.next ( );
 
 					executableFileNode.setExecutableFileName ( currFile.getName ( ) );
+					executableFileNode.setExecutableFileNameWithoutExtension ( executableFileNode.getExecutableFileName ( ) );
 					executableFileNode.setExecutableFilePath ( currFile.getPath ( ) );
 					executableFileNode.setParentFolderPath ( currFile.getParent ( ) );
 				}
-
-				/*currentFile = imageNode.findTheRequestedFile ( imageNode.createListWithTheRightFolders ( ), nodeM.group ( 1 ) );
-
-				imageNode.setAbsolutePath ( currentFile.getAbsolutePath ( ) );
-				imageNode.findNameOfImage ( currentFile.getName ( ) );
-				imageNode.findTypeOfImage ( currentFile.getName ( ) );
-				imageNode.setAbsoluteNameOfImage ( imageNode.getImageName ( ), imageNode.getImageType ( ) );
-				imageNode.setParentFolderPath ( currentFile.getParentFile ( ).getPath ( ) );
-				imageNode.setResolutionOfImage ( currentFile );
-
-				executableFileNode.setRootFolderPath ( absolutePathForExecutableFiles );
-				executableFileNode.findFilePath ( imageNode.getImageName ( ) );*/
-
-
 
 				try {
 
@@ -251,7 +239,6 @@ public class Launcher {
 	  * Create all the buttons for the app.
 	**/
 	public void createAllImageButtonsInFrame ( JFrame launcherWindow, List<FindPathsFromExecutableFiles> listOfExecutableFiles, Launcher launcher ) {
-
 		Iterator<FindImagesPaths> findIt;
 		FindImagesPaths currentNode;
 		Thread executeThread=null;
@@ -297,14 +284,16 @@ public class Launcher {
 				button.setIcon ( image );
 
 			} catch (Exception ex) {
+
 				System.err.println("Couldn't find file: ");
 			}
 
 		}catch ( Exception ex ) {
+
 			System.out.println ( "Error" );
 		}
 
-	}
+	}	
 
 	public class CreateFileMenuItemActionListener implements ActionListener {
 		private Launcher launcher;
@@ -325,26 +314,20 @@ public class Launcher {
 			addWindow.setSize ( 400, 300 );
 			addWindow.setTitle ( "Add New App" );
 			addWindow.setDefaultCloseOperation ( WindowConstants.EXIT_ON_CLOSE );
-			addWindow.setLayout( new GridLayout ( 100, 100 ) );
+			addWindow.setLayout( new GridLayout ( 3, 1 ) );
 			
 			headerLabel = new JLabel ( "", JLabel.CENTER );
 			statusLabel = new JLabel("",JLabel.CENTER);    
 
     		statusLabel.setSize(250,100);
 
-			//controlPanel = new JPanel();
-        	//controlPanel.setLayout(new FlowLayout());
-
-        	JLabel background = new JLabel ( new ImageIcon ( "/home/giorgos/Documents/Projects/Launcher/bin/newImage.png") );
-        	
-        	addWindow.add ( background );
-        	background.setLayout ( new FlowLayout ( ) );
+			controlPanel = new JPanel();
+        	controlPanel.setLayout(new FlowLayout());
 
         	addWindow.add ( headerLabel );
-        	//addWindow.add ( controlPanel );
+        	addWindow.add ( controlPanel );
         	addWindow.add ( statusLabel );
 
-			addWindow.pack ( );
 			addWindow.setVisible ( true );
 
 			headerLabel.setText ( "Add a new application you want to launch.");
@@ -365,11 +348,11 @@ public class Launcher {
     					
     					if ( file.length ( ) == 0 ) {
     						
-    						textToAppend = userText.getText ( ) + "\\";
+    						textToAppend = userText.getText ( ) + "/";
     						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
     					}else {
 
-    						textToAppend = userText.getText ( ) + "\\";
+    						textToAppend = userText.getText ( ) + "/";
     						Files.write( Paths.get(configFile), textToAppend.getBytes(), StandardOpenOption.APPEND);
     					}
 					}catch (IOException ioex) {
@@ -378,21 +361,17 @@ public class Launcher {
 					}
 
         			addWindow.setVisible ( false );
-        			resize = true;
 
-        			launcher.findImagesNames ( launcher );
+					listOfImages.clear ( );
+					listOfExecutableFiles.clear ( );
+					
+					findImagesNames ( launcher );
          		}
       		});
 
-			/*
 			controlPanel.add ( namelabel );
 			controlPanel.add ( userText );
 			controlPanel.add ( addButton );
-			*/
-
-			background.add ( namelabel );
-			background.add ( userText );
-			background.add ( addButton );
 
 			addWindow.setVisible ( true );
 		}

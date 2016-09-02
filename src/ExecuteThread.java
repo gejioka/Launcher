@@ -59,8 +59,8 @@ public class ExecuteThread implements Runnable {
 
 		    		currentNode = imIt.next ( );
 
-		    		System.out.println ( currentNode.getExecutableFileName ( ) + " " + nameOfExecuteFile );
-		    		if ( currentNode.getExecutableFileName ( ).contains ( nameOfExecuteFile ) ) {
+		    		System.out.println ( currentNode.getExecutableFileNameWithoutExtension ( ) + " " + nameOfExecuteFile );
+		    		if ( nameOfExecuteFile.contains ( currentNode.getExecutableFileNameWithoutExtension ( ) ) || currentNode.getExecutableFileNameWithoutExtension ( ).contains ( nameOfExecuteFile ) ) {
 		    			
 		    			Process proc = Runtime.getRuntime( ).exec( new String[] { "/bin/bash", "deskopen", currentNode.getExecutableFilePath ( ) } );
 		    			

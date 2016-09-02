@@ -19,6 +19,7 @@ public class FindPathsFromExecutableFiles {
 	private String executableFilePath;
 	private String rootFolderPath;
 	private String parentFolderPath;
+	private String executableFileNameWithoutExtension;
 
 	/** FindPathsFromExecutableFiles ( )
 	  * type: FindPathsFromExecutableFiles
@@ -47,6 +48,30 @@ public class FindPathsFromExecutableFiles {
 	public String getExecutableFileName ( ) {
 	
 		return executableFileName;		
+	}
+
+	/** setExecutableFileNameWithoutExtension ( )
+	  * type: void
+	  * params: String executableFileName
+	  * Set the name of the executable file without its extension.
+	**/
+	public void setExecutableFileNameWithoutExtension ( String executableFileName ) {
+		int position = executableFileName.lastIndexOf ( "." );
+		
+		if ( position > 0 ) {
+
+    		executableFileNameWithoutExtension = executableFileName.substring ( 0, position );
+		}
+	}
+
+	/** getExecutableFileNameWithoutExtension ( )
+	  * type: String
+	  * params: -
+	  * Return the name of the executable file without its extension.
+	**/
+	public String getExecutableFileNameWithoutExtension ( ) {
+
+		return executableFileNameWithoutExtension;
 	}
 
 	/** setExecutableFilePath ( )
@@ -108,29 +133,4 @@ public class FindPathsFromExecutableFiles {
 
 		return parentFolderPath;
 	}
-
-	/** findFilePath ( )
-	  * type: void
-	  * params: String fileName
-	  * Find the specific executable file.
-	**/
-	/*
-	public void findFilePath ( String fileName ) {
-		File rootFile;
-		File[] listOfFiles;
-		int i;
-
-		rootFile = new File ( rootFolderPath );
-		listOfFiles = rootFile.listFiles ( );
-
-		for ( i = 0; i < listOfFiles.length; i++ ) {
-
-			if ( listOfFiles[i].getName ( ).contains ( fileName ) ) {
-
-				setExecutableFileName ( listOfFiles[i].getName ( ) );
-				setExecutableFilePath ( listOfFiles[i].getPath ( ) );
-				setRootFolderPath ( listOfFiles[i].getParentFile ( ).getName ( ) );
-			}
-		} 
-	}*/
 }	
